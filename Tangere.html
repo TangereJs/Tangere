@@ -1,0 +1,40 @@
+/* 
+    loads fixed Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps
+*/
+<link rel="import" href="../polymer/polymer.html">
+
+<script>
+  (function (scope) {
+    // fix template nesting bug by copying template node.content to dom node._content after import
+    scope.Base.instanceTemplate = function (template) {
+      var dom = document.importNode(template._content || template.content, true);
+      fixImportedNodes(template._content || template.content, dom);
+      return dom;
+    }
+
+    function fixImportedNodes(node, orig) {
+      var a, i, il;
+
+      switch (node.nodeType) {
+
+        case document.ELEMENT_NODE:
+          if (node.tagName == "TEMPLATE") {   
+            orig._content = node.content;     // copying to ._content as updating .content fails in Safari
+          }
+
+          // handle childes recursively          
+          if (node.childNodes && node.childNodes.length > 0) {
+            for (i = 0, il = node.childNodes.length; i < il; i++) {
+              fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+            }
+          }
+
+        case document.DOCUMENT_FRAGMENT_NODE:
+          for (i = 0, il = node.childNodes.length; i < il; ++i) {
+            fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+          }
+      }
+    }
+
+  })(Polymer);
+</script>
