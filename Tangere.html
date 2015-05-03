@@ -1,10 +1,17 @@
 /* 
-    loads fixed Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps
+    loads fixed and extented Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps
 */
 <link rel="import" href="../polymer/polymer.html">
 
 <script>
   (function (scope) {
+
+    // globals
+    Tangere = window.Tangere || {};
+    Tangere.session = Tangere.session || {};
+    Tangere.session.temp = Tangere.session.temp || {};
+
+
     // fix template nesting bug by copying template node.content to dom node._content after import
     scope.Base.instanceTemplate = function (template) {
       var dom = document.importNode(template._content || template.content, true);
