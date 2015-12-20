@@ -1,47 +1,72 @@
-/* 
-    loads fixed and extented Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps
-*/
+/* loads fixed and extented Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps */
 <link rel="import" href="../polymer/polymer.html">
 
 <script>
-  (function (scope) {
+	(function (scope) {
 
-    // globals
-    Tangere = window.Tangere || {};
-    Tangere.session = Tangere.session || {};
-    Tangere.session.temp = Tangere.session.temp || {};
+		// globals
+		Tangere = window.Tangere || {};
+		Tangere.session = Tangere.session || {};
+		Tangere.session.temp = Tangere.session.temp || {};
+		Tangere.styleVars = {};
 
+		// convert all css variables to const, so first assignment of CSS can't be changed
+		Polymer.StyleProperties.collectProperties = function (rule, properties) {
+			var info = rule.propertyInfo;
+			if (info) {
+				if (info.properties) {
+					Polymer.Base.mixin(properties, info.properties);
+					return true;
+				}
+			} else {
+				var m, rx = this.rx.VAR_ASSIGN;
+				var cssText = rule.parsedCssText;
+				var any;
+				while (m = rx.exec(cssText)) {
+					// note: group 2 is var, 3 is mixin
 
-    // fix template nesting bug by copying template node.content to dom node._content after import
-    scope.Base.instanceTemplate = function (template) {
-      var dom = document.importNode(template._content || template.content, true);
-      fixImportedNodes(template._content || template.content, dom);
-      return dom;
-    }
+					var vname = m[1];
+					var vval = (m[2] || m[3]).trim();
 
-    function fixImportedNodes(node, orig) {
-      var a, i, il;
+					Tangere.styleVars[vname] = Tangere.styleVars[vname] || vval;
+					properties[m[1]] = Tangere.styleVars[vname];
 
-      switch (node.nodeType) {
+					any = true;
+				}
+				return any;
+			}
+		}
 
-        case document.ELEMENT_NODE:
-          if (node.tagName == "TEMPLATE") {   
-            orig._content = node.content;     // copying to ._content as updating .content fails in Safari
-          }
+		// fix template nesting bug by copying template node.content to dom node._content after import
+		scope.Base.instanceTemplate = function (template) {
+			var dom = document.importNode(template._content || template.content, true);
+			fixImportedNodes(template._content || template.content, dom);
+			return dom;
+		}
 
-          // handle childes recursively          
-          if (node.childNodes && node.childNodes.length > 0) {
-            for (i = 0, il = node.childNodes.length; i < il; i++) {
-              fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
-            }
-          }
+		function fixImportedNodes(node, orig) {
+			var a, i, il;
 
-        case document.DOCUMENT_FRAGMENT_NODE:
-          for (i = 0, il = node.childNodes.length; i < il; ++i) {
-            fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
-          }
-      }
-    }
+			switch (node.nodeType) {
 
-  })(Polymer);
+			case document.ELEMENT_NODE:
+				if (node.tagName == "TEMPLATE") {
+					orig._content = node.content; // copying to ._content as updating .content fails in Safari
+				}
+
+				// handle childes recursively          
+				if (node.childNodes && node.childNodes.length > 0) {
+					for (i = 0, il = node.childNodes.length; i < il; i++) {
+						fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+					}
+				}
+
+			case document.DOCUMENT_FRAGMENT_NODE:
+				for (i = 0, il = node.childNodes.length; i < il; ++i) {
+					fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+				}
+			}
+		}
+
+	})(Polymer);
 </script>
