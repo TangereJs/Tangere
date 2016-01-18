@@ -8,10 +8,12 @@
 		Tangere = window.Tangere || {};
 		Tangere.session = Tangere.session || {};
 		Tangere.session.temp = Tangere.session.temp || {};
-		Tangere.styleVars = {};
+		
 
 		// convert all css variables to const, so first assignment of CSS can't be changed
-		Polymer.StyleProperties.collectProperties = function (rule, properties) {
+    /*
+		Tangere.styleVars = {};
+    Polymer.StyleProperties.collectProperties = function (rule, properties) {
 			var info = rule.propertyInfo;
 			if (info) {
 				if (info.properties) {
@@ -36,7 +38,8 @@
 				return any;
 			}
 		}
-
+    */
+    
 		// fix template nesting bug by copying template node.content to dom node._content after import
 		scope.Base.instanceTemplate = function (template) {
 			var dom = document.importNode(template._content || template.content, true);
