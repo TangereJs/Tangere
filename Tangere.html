@@ -39,6 +39,12 @@
 			}
 		}
     */
+
+	  // enable :active on all elemenets on iOS
+		document.addEventListener("DOMContentLoaded", function (event) {
+		  document.body.addEventListener('touchstart', function () { }, false);
+		});
+		
     
 		// fix template nesting bug by copying template node.content to dom node._content after import
 		scope.Base.instanceTemplate = function (template) {
@@ -70,6 +76,43 @@
 				}
 			}
 		}
+
+		Tangere.behavior = {};
+
+		Tangere.behavior.handleLink = {
+
+		  ignoreEvent: function (e) {
+		    e.preventDefault();
+		    e.stopPropagation();
+		    return false;
+		  },
+		  handleLink: function (e) {
+		    // allow childs to set a different target url, if not provided use default url
+		    var href = "";
+		    if (!href && e.url) href = e.url;
+		    if (!href && e.currentTarget && e.currentTarget.href) href = e.currentTarget.href;
+		    if (!href && e.currentTarget.attributes && e.currentTarget.attributes.url) href = e.currentTarget.attributes.url.value;
+		    if (!href && e.detail && e.detail.sourceEvent && e.detail.sourceEvent.currentTarget && e.detail.sourceEvent.currentTarget.href) href = e.detail.sourceEvent.currentTarget.href;
+		    if (!href) console.log("handLink Url missing");
+
+		    // convert absolute link to app to relative
+		    if (href.indexOf(window.location.origin + window.location.pathname + "#") == 0) {
+		      href = href.substring(href.indexOf("#"));
+		    }
+
+		    if (href) {
+		      if (href.indexOf("#") == 0) {
+		        Polymer.signal("navigate-to", href);
+		      } else {
+		        window.open(href, '_blank');
+		      }
+		    }
+		    e.preventDefault();
+		    e.stopPropagation();
+		    return false;
+		  },
+		};
+
 
 	})(Polymer);
 </script>
