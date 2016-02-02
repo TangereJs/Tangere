@@ -2,15 +2,15 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <script>
-	(function (scope) {
+  (function (scope) {
 
-		// globals
-		Tangere = window.Tangere || {};
-		Tangere.session = Tangere.session || {};
-		Tangere.session.temp = Tangere.session.temp || {};
-		
+    // globals
+    Tangere = window.Tangere || {};
+    Tangere.session = Tangere.session || {};
+    Tangere.session.temp = Tangere.session.temp || {};
 
-		// convert all css variables to const, so first assignment of CSS can't be changed
+
+    // convert all css variables to const, so first assignment of CSS can't be changed
     /*
 		Tangere.styleVars = {};
     Polymer.StyleProperties.collectProperties = function (rule, properties) {
@@ -39,86 +39,99 @@
 			}
 		}
     */
-    
-		// fix template nesting bug by copying template node.content to dom node._content after import
-		scope.Base.instanceTemplate = function (template) {
-			var dom = document.importNode(template._content || template.content, true);
-			fixImportedNodes(template._content || template.content, dom);
-			return dom;
-		}
 
-		function fixImportedNodes(node, orig) {
-			var a, i, il;
+    // fix template nesting bug by copying template node.content to dom node._content after import
+    scope.Base.instanceTemplate = function (template) {
+      var dom = document.importNode(template._content || template.content, true);
+      fixImportedNodes(template._content || template.content, dom);
+      return dom;
+    }
 
-			switch (node.nodeType) {
+    function fixImportedNodes(node, orig) {
+      var a, i, il;
 
-			case document.ELEMENT_NODE:
-				if (node.tagName == "TEMPLATE") {
-					orig._content = node.content; // copying to ._content as updating .content fails in Safari
-				}
+      switch (node.nodeType) {
 
-				// handle childes recursively          
-				if (node.childNodes && node.childNodes.length > 0) {
-					for (i = 0, il = node.childNodes.length; i < il; i++) {
-						fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
-					}
-				}
+      case document.ELEMENT_NODE:
+        if (node.tagName == "TEMPLATE") {
+          orig._content = node.content; // copying to ._content as updating .content fails in Safari
+        }
 
-			case document.DOCUMENT_FRAGMENT_NODE:
-				for (i = 0, il = node.childNodes.length; i < il; ++i) {
-					fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
-				}
-			}
-		}
+        // handle childes recursively          
+        if (node.childNodes && node.childNodes.length > 0) {
+          for (i = 0, il = node.childNodes.length; i < il; i++) {
+            fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+          }
+        }
 
-		Tangere.behavior = {};
+      case document.DOCUMENT_FRAGMENT_NODE:
+        for (i = 0, il = node.childNodes.length; i < il; ++i) {
+          fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+        }
+      }
+    }
 
-		Tangere.behavior.handleLink = {
+    Tangere.behavior = {};
 
-		  ignoreEvent: function (e) {
-		    e.preventDefault();
-		    e.stopPropagation();
-		    return false;
-		  },
-		  handleLink: function (e) {
-		    // allow childs to set a different target url, if not provided use default url
-		    var href = "", el;
-		    if (!href && e.url) { href = e.url; el = e };
-		    if (!href && e.currentTarget && e.currentTarget.href) { href =  e.currentTarget.href; el = e.currentTarget };
-		    if (!href && e.currentTarget.attributes && e.currentTarget.attributes.url) { href = e.currentTarget.attributes.url.value; el = e.currentTarget };
-		    if (!href && e.detail && e.detail.sourceEvent && e.detail.sourceEvent.currentTarget && e.detail.sourceEvent.currentTarget.href) { href = e.detail.sourceEvent.currentTarget.href; el = e.detail.sourceEvent.currentTarget };
-		    if (!href) console.log("handLink Url missing");
-		    
+    Tangere.behavior.handleLink = {
+
+      ignoreEvent: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      },
+      handleLink: function (e) {
+        // allow childs to set a different target url, if not provided use default url
+        var href = "",
+          el;
+        if (!href && e.url) {
+          href = e.url;
+          el = e
+        };
+        if (!href && e.currentTarget && e.currentTarget.href) {
+          href = e.currentTarget.href;
+          el = e.currentTarget
+        };
+        if (!href && e.currentTarget.attributes && e.currentTarget.attributes.url) {
+          href = e.currentTarget.attributes.url.value;
+          el = e.currentTarget
+        };
+        if (!href && e.detail && e.detail.sourceEvent && e.detail.sourceEvent.currentTarget && e.detail.sourceEvent.currentTarget.href) {
+          href = e.detail.sourceEvent.currentTarget.href;
+          el = e.detail.sourceEvent.currentTarget
+        };
+        if (!href) console.log("handLink Url missing");
+
         // highlight current element
-		    if (el) {
-		      Polymer.dom(el).classList.add("active");
-		      setTimeout(function () {
-		        Polymer.dom(el).classList.remove("active");
-		      }.bind(this), 300);
-		    }
-		    
+        if (el) {
+          Polymer.dom(el).classList.add("active");
+          setTimeout(function () {
+            Polymer.dom(el).classList.remove("active");
+          }.bind(this), 300);
+        }
 
-		    // convert absolute link to app to relative
-		    if (href.indexOf(window.location.origin + window.location.pathname + "#") == 0) {
-		      href = href.substring(href.indexOf("#"));
-		    }
 
-		    if (href) {
-		      if (href.indexOf("#") == 0) {
-		       		        
-		        Polymer.signal("busy-start-async");		        
+        // convert absolute link to app to relative
+        if (href.indexOf(window.location.origin + window.location.pathname + "#") == 0) {
+          href = href.substring(href.indexOf("#"));
+        }
+
+        if (href) {
+          if (href.indexOf("#") == 0) {
+
+            Polymer.signal("busy-start-async");
             Polymer.signal("navigate-to", href);
 
-		      } else {
-		        window.open(href, '_blank');
-		      }
-		    }
-		    e.preventDefault();
-		    e.stopPropagation();
-		    return false;
-		  },
-		};
+          } else {
+            window.open(href, '_blank');
+          }
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      },
+    };
 
 
-	})(Polymer);
+  })(Polymer);
 </script>
