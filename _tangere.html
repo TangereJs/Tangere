@@ -1,5 +1,6 @@
 /* loads fixed and extented Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps */
 <link rel="import" href="../polymer/polymer.html">
+<script src="../moment/moment.js"></script>
 
 <script>
   (function (scope) {
@@ -9,7 +10,7 @@
     Tangere.behaviors = Tangere.behaviors || {};
     Tangere.session = Tangere.session || {};
     Tangere.session.temp = Tangere.session.temp || {};
-
+    Tangere.session.user = Tangere.session.user || {};
 
     // convert all css variables to const, so first assignment of CSS can't be changed
     /*
@@ -133,6 +134,16 @@
       },
     };
 
+
+    // -- global repository for languages
+    scope.atI18nLocales = Polymer.atI18nLocales || {
+
+      add: function (localName, locale, translations) {
+        this[localName] = this[localName] || {};
+        this[localName][locale.toLowerCase()] = translations;
+      }
+
+    };
 
   })(Polymer);
 </script>
