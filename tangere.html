@@ -54,22 +54,22 @@
 
       switch (node.nodeType) {
 
-      case document.ELEMENT_NODE:
-        if (node.tagName == "TEMPLATE") {
-          orig._content = node.content; // copying to ._content as updating .content fails in Safari
-        }
+        case document.ELEMENT_NODE:
+          if (node.tagName == "TEMPLATE") {
+            orig._content = node.content; // copying to ._content as updating .content fails in Safari
+          }
 
-        // handle childes recursively          
-        if (node.childNodes && node.childNodes.length > 0) {
-          for (i = 0, il = node.childNodes.length; i < il; i++) {
+          // handle childes recursively
+          if (node.childNodes && node.childNodes.length > 0) {
+            for (i = 0, il = node.childNodes.length; i < il; i++) {
+              fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+            }
+          }
+
+        case document.DOCUMENT_FRAGMENT_NODE:
+          for (i = 0, il = node.childNodes.length; i < il; ++i) {
             fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
           }
-        }
-
-      case document.DOCUMENT_FRAGMENT_NODE:
-        for (i = 0, il = node.childNodes.length; i < il; ++i) {
-          fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
-        }
       }
     }
 
@@ -84,24 +84,28 @@
       },
       handleLink: function (e) {
         // allow childs to set a different target url, if not provided use default url
-        var href = "",
-          el;
+        var href = "", el;
+
         if (!href && e.url) {
           href = e.url;
           el = e
         };
+
         if (!href && e.currentTarget && e.currentTarget.href) {
           href = e.currentTarget.href;
           el = e.currentTarget
         };
+
         if (!href && e.currentTarget.attributes && e.currentTarget.attributes.url) {
           href = e.currentTarget.attributes.url.value;
           el = e.currentTarget
         };
+
         if (!href && e.detail && e.detail.sourceEvent && e.detail.sourceEvent.currentTarget && e.detail.sourceEvent.currentTarget.href) {
           href = e.detail.sourceEvent.currentTarget.href;
           el = e.detail.sourceEvent.currentTarget
         };
+
         if (!href) console.log("handLink Url missing");
 
         // highlight current element
@@ -110,6 +114,18 @@
           setTimeout(function () {
             Polymer.dom(el).classList.remove("active");
           }.bind(this), 300);
+        }
+
+
+        // when running in IFrame and we also have a direct link to the external url open it
+        if (el && el.getAttribute("xref")) {
+
+          // running in embeded mode
+          if (window.parentIFrame != null) {
+            href = el.getAttribute("xref");
+            window.parentIFrame.sendMessage({ cmd: "navigate-to", url: href });
+            return;
+          }
         }
 
 
