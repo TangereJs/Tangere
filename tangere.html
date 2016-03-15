@@ -54,22 +54,22 @@
 
       switch (node.nodeType) {
 
-        case document.ELEMENT_NODE:
-          if (node.tagName == "TEMPLATE") {
-            orig._content = node.content; // copying to ._content as updating .content fails in Safari
-          }
+      case document.ELEMENT_NODE:
+        if (node.tagName == "TEMPLATE") {
+          orig._content = node.content; // copying to ._content as updating .content fails in Safari
+        }
 
-          // handle childes recursively
-          if (node.childNodes && node.childNodes.length > 0) {
-            for (i = 0, il = node.childNodes.length; i < il; i++) {
-              fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
-            }
-          }
-
-        case document.DOCUMENT_FRAGMENT_NODE:
-          for (i = 0, il = node.childNodes.length; i < il; ++i) {
+        // handle childes recursively
+        if (node.childNodes && node.childNodes.length > 0) {
+          for (i = 0, il = node.childNodes.length; i < il; i++) {
             fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
           }
+        }
+
+      case document.DOCUMENT_FRAGMENT_NODE:
+        for (i = 0, il = node.childNodes.length; i < il; ++i) {
+          fixImportedNodes(node.childNodes[i], orig.childNodes[i]);
+        }
       }
     }
 
@@ -83,6 +83,7 @@
         return false;
       },
       handleLink: function (e) {
+        
         // allow childs to set a different target url, if not provided use default url
         var href = "", el;
 
@@ -117,13 +118,24 @@
         }
 
 
+
         // when running in IFrame and we also have a direct link to the external url open it
         if (el && el.getAttribute("xref")) {
 
           // running in embeded mode
           if (window.parentIFrame != null) {
             href = el.getAttribute("xref");
-            window.parentIFrame.sendMessage({ cmd: "navigate-to", url: href });
+            window.parentIFrame.sendMessage({
+              cmd: "navigate-to",
+              url: href
+            });
+            return;
+          }
+
+          // chrome extension -> open in new tab
+          if (window.chrome && chrome.runtime) {
+            href = el.getAttribute("xref");
+            window.open(href, '_blank');
             return;
           }
         }
