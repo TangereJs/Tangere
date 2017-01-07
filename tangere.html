@@ -14,35 +14,13 @@
     Tangere.session.user = Tangere.session.user || {};
     Tangere.session.location = window.location;
 
-    // convert all css variables to const, so first assignment of CSS can't be changed
-    /*
-		Tangere.styleVars = {};
-    Polymer.StyleProperties.collectProperties = function (rule, properties) {
-			var info = rule.propertyInfo;
-			if (info) {
-				if (info.properties) {
-					Polymer.Base.mixin(properties, info.properties);
-					return true;
-				}
-			} else {
-				var m, rx = this.rx.VAR_ASSIGN;
-				var cssText = rule.parsedCssText;
-				var any;
-				while (m = rx.exec(cssText)) {
-					// note: group 2 is var, 3 is mixin
-
-					var vname = m[1];
-					var vval = (m[2] || m[3]).trim();
-
-					Tangere.styleVars[vname] = Tangere.styleVars[vname] || vval;
-					properties[m[1]] = Tangere.styleVars[vname];
-
-					any = true;
-				}
-				return any;
-			}
-		}
-    */
+    // disable async in chrome as a workaround for https://github.com/Polymer/polymer/issues/2522 
+    var _importHref = scope.Base.importHref;
+    scope.Base.importHref = function (u, s, e, a) {      
+      if (scope.Settings.useNativeCustomElements) a = false;     
+      return _importHref.call(this,u,s,e,a);
+    }
+  
 
     // fix template nesting bug by copying template node.content to dom node._content after import
     scope.Base.instanceTemplate = function (template) {
