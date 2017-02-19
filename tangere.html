@@ -26,6 +26,8 @@
       browser.mobile = browser.android || browser.ios;
       browser.desktop = !browser.mobile;
 
+      browser.chromeExtension = window.chrome && chrome.runtime && !!chrome.runtime.id;
+
       return browser;
     }
 
