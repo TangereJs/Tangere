@@ -14,6 +14,22 @@
     Tangere.session.user = Tangere.session.user || {};
     Tangere.session.location = window.location;
 
+    // browser detection 
+    Tangere.session.browser = Tangere.session.browser || _getBrowser();
+
+    function _getBrowser() {
+      var browser = {};
+      var ua = navigator.userAgent;
+
+      browser.android = !!ua.match(/Android/i);
+      browser.ios = !!ua.match(/iPhone|iPod|iPad/i)
+      browser.mobile = browser.android || browser.ios;
+      browser.desktop = !browser.mobile;
+
+      return browser;
+    }
+
+
     // disable async in chrome as a workaround for https://github.com/Polymer/polymer/issues/2522 
     var _importHref = scope.Base.importHref;
     scope.Base.importHref = function (u, s, e, a) {      
