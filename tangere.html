@@ -26,8 +26,8 @@
       browser.mobile = browser.android || browser.ios;
       browser.desktop = !browser.mobile;
 
-      // running in an extension - currently only indirectly detectable
-      browser.extension = window.location.pathname.startsWith("/Extension");  
+      // running in an extension - currently only indirectly detectable      
+      browser.extension = (window.location.pathname.indexOf("/Extension") == 0);
 
       return browser;
     }
