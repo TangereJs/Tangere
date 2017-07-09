@@ -1,5 +1,9 @@
 /* loads fixed and extented Polymer version -- always load Tangere.html instead of Polymer.html in all Tangere Apps */
-<script> Polymer = { lazyRegister: true, useNativeCSSProperties: true };</script> 
+<script>
+  var useNativeCSSProperties = true;
+  if (navigator.appVersion.indexOf('Edge') > -1) useNativeCSSProperties = false;
+  Polymer = { lazyRegister: true, useNativeCSSProperties: useNativeCSSProperties };
+</script> 
 <link rel="import" href="../polymer/polymer.html">
 <script src="../moment/moment.js"></script>
 
