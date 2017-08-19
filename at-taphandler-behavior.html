@@ -1,6 +1,19 @@
 <link rel="import" href="../tangere/tangere.html">
 
 
+<style>
+
+    .collapsed .expanded-only {
+      display: none;
+    }
+
+    .expanded .collapsed-only {
+      display:none;
+    }
+
+</style>
+
+
 <script>
   Tangere.behaviors.taphandler = {
 
@@ -22,7 +35,7 @@
       },
 
     _tapHandler: function (e) {
-     
+
       var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
 
       if (!p || p.length == 0) return;
@@ -46,11 +59,23 @@
       var data = src.getAttribute("tap-event-data");
 
       if (event == "dialog") this._dialog(data);
-
+      if (event == "container-mode") this._containerMode(data);
+      
       // event is handled here, so stop propagation
       e.preventDefault();
       e.stopPropagation();
       return false;
+    },
+
+    _containerMode: function (data) {
+
+      if (!this.$.container) return;
+
+      this.toggleClass("expanded", data == "expanded", this.$.container);
+      this.toggleClass("collapsed", data == "collapsed", this.$.container);
+
+      this.fire('content-changed', this, { bubbles: true });
+
     },
 
     _dialog: function (data) {
