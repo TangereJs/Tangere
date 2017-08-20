@@ -32,6 +32,9 @@
       browser.android = !!ua.match(/Android/i);
       browser.ios = !!ua.match(/iPhone|iPod|iPad/i)
       browser.mobile = browser.android || browser.ios;
+           
+      // small device is seen as mobile (e.g. extension)
+      if (window.innerWidth < 500) browser.mobile = true;
       browser.desktop = !browser.mobile;
 
       // running in an extension - currently only indirectly detectable      
