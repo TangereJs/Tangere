@@ -35,7 +35,7 @@
       },
 
     _tapHandler: function (e) {
-
+ 
       var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
 
       if (!p || p.length == 0) return;
@@ -120,8 +120,7 @@
         dialog.appendChild(cardComponent);
         Polymer.dom.flush();
 
-        //var body = document.querySelector('body');
-        //Polymer.dom(body).appendChild(this.$.dialog);
+        this.$.dialog.name = element;
         this.$.dialog.open();
 
       }, function (err) {
