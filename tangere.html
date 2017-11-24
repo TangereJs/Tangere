@@ -222,11 +222,6 @@
 
     };
 
-    // 
-    // Polymer.Base.scopeSubtree monkey patch starts here
-    // 
-
-    var oldScopeSubtree = scope.Base.scopeSubtree;
     var nativeShadow = Polymer.Settings.useNativeShadow;
     
     scope.Base.scopeSubtree = function (container, shouldObserve) {
@@ -236,13 +231,38 @@
       var self = this;
       var scopify = function (node) {
         if (node.nodeType === Node.ELEMENT_NODE) {
+          // BUG 1. class attribute change
+          // we change the modification to class attribute to 
+          // var className = node.getAttribute('class');
+          // node.setAttribute('class', self._scopeElementClass(node, className));
+      
+          // to modification to classList property
           node.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
           node.classList.add(self.is);
+
+          // BUG 2. in shadyDom querySelectorAll returns children from shadyDOM
+          // and causes children from shadyDOM to get scoped with css from parent
+          // var n$ = node.querySelectorAll('*');
+          
+          // solution is 
           var n$ = Polymer.dom(node).children;
+          // because Polymer.dom(...).children doesn't return elements from shadyDom
+          // if elements from shadyDom should be processed, then a call to 
+          // Polymer.dom(node.root).children should be used
           
           for (var i = 0, n; i < n$.length && (n = n$[i]); i++) {
+            // BUG 1. class attribute change
+            // we change the modification to class attribute to 
+            // className = n.getAttribute('class');
+            // n.setAttribute('class', self._scopeElementClass(n, className));
+
+            // to modification to classList property
             n.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
             n.classList.add(self.is);
+            
+            // BUG 2. subree traversal fix
+            // Polymer.dom(...).children only returns nodes direct children, it doesn't
+            // return the whole subtree tree. We traverse and scope the subree tree manually
             var nChilds = Polymer.dom(n).children;
             nChilds.forEach(function(nChild) { 
               scopify(nChild);
