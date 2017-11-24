@@ -222,5 +222,54 @@
 
     };
 
+    // 
+    // Polymer.Base.scopeSubtree monkey patch starts here
+    // 
+
+    var oldScopeSubtree = scope.Base.scopeSubtree;
+    var nativeShadow = Polymer.Settings.useNativeShadow;
+    
+    scope.Base.scopeSubtree = function (container, shouldObserve) {
+      if (nativeShadow) {
+        return;
+      }
+      var self = this;
+      var scopify = function (node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          node.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
+          node.classList.add(self.is);
+          var n$ = Polymer.dom(node).children;
+          
+          for (var i = 0, n; i < n$.length && (n = n$[i]); i++) {
+            n.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
+            n.classList.add(self.is);
+            var nChilds = Polymer.dom(n).children;
+            nChilds.forEach(function(nChild) { 
+              scopify(nChild);
+            });
+          }
+        }
+      };
+      
+      scopify(container);
+      
+      if (shouldObserve) {
+        var mo = new MutationObserver(function (mxns) {
+          for (var i = 0, m; i < mxns.length && (m = mxns[i]); i++) {
+            if (m.addedNodes) {
+              for (var j = 0; j < m.addedNodes.length; j++) {
+                scopify(m.addedNodes[j]);
+              }
+            }
+          }
+        });
+        mo.observe(container, {
+          childList: true,
+          subtree: true
+        });
+        return mo;
+      }
+    };
+
   })(Polymer);
 </script>
