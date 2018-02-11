@@ -1,0 +1,255 @@
+<link rel="import" href="../tangere/tangere.html">
+
+
+<style>
+
+    .collapsed .expanded-only {
+      display: none !important;
+    }
+
+    .expanded .collapsed-only {
+      display:none !important;
+    }
+
+    .desktop .mobile-only {
+      display:none !important;
+    }
+
+    .mobile .desktop-only {
+      display:none !important;
+    }
+
+</style>
+
+
+<script>
+  Tangere.behaviors.actionhandler = {
+
+    properties: {
+      actionHandler: {
+        type: Object,
+        value: null
+      }
+    },
+
+    listeners: {      
+      'tap': '_tapHandler'
+    },
+
+    __getElementPath: function(element) {
+      if (element == null) return [];
+ 
+      var pathArr = [element];
+ 
+      while(element.parentElement != null) {
+        element = element.parentElement;
+        pathArr.push(element);
+      }
+ 
+      return pathArr;
+      },
+
+    _tapHandler: function (e) {
+
+      var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
+
+      if (!p || p.length == 0) return;
+
+      for (var i = 0; i < p.length; i++) {
+        n = p[i];
+        if (n.getAttribute("at-click-action") != null) {
+          // found source node with tap-event attribute
+          src = n;
+          break;
+        }
+
+        // stop searching node tree "above" current card
+        if (n == this) break;
+      }
+
+      // exit tap handler when no source node was found
+      if (!src) return;
+
+      var attrs = this._getNodeAttributes(src);
+
+      if (attrs.atClickAction) {
+        this._executeAction(attrs.atClickAction, attrs);
+
+        // event is handled here, so stop propagation
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+     
+    },
+
+    _executeAction: function(action, attrs) {
+
+      var customHandler = false;
+      var evt = { action: action, args: attrs, model: this.data.model };
+      var oldData = this._stringifyJSON(this.data);
+
+      // cache action handlers
+      if (this._actions == undefined) {
+        let _actions = {};
+        if (this.__actions) _actions = this.__actions();
+        this._actions = _actions;
+      }
+
+      if (this._actions) {
+        var act = this._actions[action];
+        if (act) {
+          act.apply(this, [evt]);
+          customHandler = true;
+        }
+      }
+
+      // invoke generic action handlers
+      if (!customHandler) {
+        if (action == "dialog") this._dialog(attrs);
+        if (action == "post") {          
+          debugger;
+          this.$.post.post({ a: 1 });
+        }
+      }
+
+      // detect changed data
+      if (oldData != this._stringifyJSON(this.data)) {
+        var event = this._createEventObject("_update", null, null, null, this.data);
+        this._invokeActionListeners(event);
+      }
+
+    },
+
+    // recursive reimplementation of JSON.stringify
+    _stringifyJSON: function(obj) {
+
+      // null
+      if (obj === null) {
+        return "null";
+      }
+
+      // unstringifiable - functions and undefined
+      if (obj === undefined || obj.constructor === Function) { return; }
+
+      // strings
+      if (obj.constructor === String) {
+        return '"' + obj + '"';
+      }
+
+      // arrays
+      if (obj.constructor === Array) {
+        if (obj.length) {
+          var partialJSON = [];
+
+          for (var i = 0; i < obj.length; i++) {
+            partialJSON.push(this._stringifyJSON(obj[i])); // recursion
+          }
+
+          return '[' + partialJSON.join(",") + ']';
+        } else {
+          return '[]';
+        }
+      }
+
+      // objects
+      if (obj.constructor === Object) {
+        var keys = Object.keys(obj);
+        if (keys.length) {
+          var partialJSON = '';
+
+          for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+
+            if (!key || obj[key] === undefined || typeof key === 'function' || typeof obj[key] === 'function') {
+
+            } else {
+              if (i === keys.length - 1) {
+                partialJSON += this._stringifyJSON(key) + ':' + this._stringifyJSON(obj[key]); // recursion
+              } else {
+                partialJSON += this._stringifyJSON(key) + ':' + this._stringifyJSON(obj[key]) + ','; // recursion
+              }
+            }
+          }
+          return '{' + partialJSON + '}';
+        } else {
+          return '{}';
+        }
+      }
+
+      // everything else (numbers, booleans, etc.)
+      return obj.toString();
+
+    },
+    _getNodeAttributes: function (node) {
+
+      var attr = {};
+
+      for (var i = 0, atts = node.attributes, n = atts.length; i < n; i++) {
+        attr[Polymer.CaseMap.dashToCamelCase(atts[i].nodeName)] = atts[i].value ? atts[i].value : true;        
+      }
+
+      return attr;
+    },
+
+    _dialog: function (args) {
+      
+      var dialog = args.atDialog || "dialog";
+
+      var cardEl = this.model._card.CardComponent;
+      
+      var p = cardEl.indexOf("/");
+      if (p > 0) {
+        cardEl = cardEl.substring(p+1);
+      }
+
+       p = cardEl.lastIndexOf("-card");
+      if (p>0) {
+        cardEl = cardEl.substring(0, p);
+      }          
+
+
+      if (dialog.indexOf("/") > 0) {
+        cardEl = dialog;
+      } else {
+        cardEl = cardEl + "/" + cardEl + "-" + dialog + "-card";
+      }
+
+      var compUrl = document.baseURI.indexOf("/components/") >= 0 ? "../" : "components/";
+      if (window.ComponentsBase != undefined) compUrl = window.ComponentsBase;
+
+      if (cardEl.indexOf(".html") != cardEl.length - 5) {
+        cardEl += ".html";
+      }
+
+      var componentUrl = compUrl + cardEl;
+
+      this.importHref(componentUrl, function () {
+
+        var element = cardEl.substring(cardEl.indexOf("/") + 1).replace('.html', '');
+        var cardComponent = document.createElement(element);
+
+        if (cardComponent.properties && typeof cardComponent.properties.model != "undefined") {
+          // share model 
+          cardComponent.model = this.model;
+        }
+
+        var dialog = Polymer.dom(this.$.dialog);
+        dialog.innerHTML = "";
+        dialog.appendChild(cardComponent);
+        Polymer.dom.flush();
+
+        this.$.dialog.name = element;
+        this.$.dialog.open();
+
+      }, function (err) {
+        var cn = err.target.href;
+        var ok = confirm(window.location.href + "\n\nERROR: failed to load card " + cn);
+      }, true);
+
+
+
+    },
+
+  };
+</script>
