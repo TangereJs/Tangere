@@ -73,19 +73,21 @@
       var attrs = this._getNodeAttributes(src);
 
       if (attrs.atClickAction) {
-        this._executeAction(attrs.atClickAction, attrs);
+        let handled = this._executeAction(attrs.atClickAction, attrs);
 
         // event is handled here, so stop propagation
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
+        if (handled) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
       }
      
     },
 
     _executeAction: function(action, attrs) {
 
-      var customHandler = false;
+      var handled = false;      
       var evt = { action: action, args: attrs, model: this.data.model };
       var oldData = this._stringifyJSON(this.data);
 
@@ -100,16 +102,22 @@
         var act = this._actions[action];
         if (act) {
           act.apply(this, [evt]);
-          customHandler = true;
+          handled = true;
         }
       }
 
       // invoke generic action handlers
-      if (!customHandler) {
-        if (action == "dialog") this._dialog(attrs);
+      if (!handled) {
+
+        if (action == "dialog") {
+          this._dialog(attrs);
+          handled = true;
+        }
+
         if (action == "post") {          
           debugger;
           this.$.post.post({ a: 1 });
+          handled = true;
         }
       }
 
@@ -119,6 +127,7 @@
         this._invokeActionListeners(event);
       }
 
+      return handled;
     },
 
     // recursive reimplementation of JSON.stringify
@@ -181,6 +190,7 @@
       return obj.toString();
 
     },
+
     _getNodeAttributes: function (node) {
 
       var attr = {};
