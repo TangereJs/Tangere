@@ -115,10 +115,14 @@
         }
 
         if (action == "post") {          
-          debugger;
-          this.$.post.post({ a: 1 });
+          attrs.atAgentAction = "post";
           handled = true;
         }
+      }
+
+      // POST to server
+      if (attrs && attrs.atAgentAction) {
+        this.$.post.post({ args: attrs });
       }
 
       // detect changed data
