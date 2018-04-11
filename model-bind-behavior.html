@@ -34,7 +34,7 @@
     _bindModel: function(model,modelBind) {
 
       var i=0;
-      if (!model || !modelBind) return;
+      if (!model || !modelBind) return;           
 
       var modelVars = Object.getOwnPropertyNames(this.model);
       var vars = "";
@@ -71,6 +71,12 @@
           console.error("failed to bind " + bind + " to " + binder[bind] + ": " + ex.message);
         }
 
+      }
+
+
+      // call _modelChanged if present
+      if (!(this._modelChanged == undefined)) {
+        this._modelChanged();
       }
 
     },
