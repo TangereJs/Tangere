@@ -172,7 +172,7 @@
         }
 
         if (action == "post") {
-          attrs.atAgentAction = "post";
+          if(!attrs.atAgentAction) attrs.atAgentAction = "post";
           handled = true;
         }
       }
