@@ -1,26 +1,22 @@
 <link rel="import" href="../tangere/tangere.html">
 
-
 <style>
+  .collapsed .expanded-only {
+    display: none !important;
+  }
 
-    .collapsed .expanded-only {
-      display: none !important;
-    }
+  .expanded .collapsed-only {
+    display: none !important;
+  }
 
-    .expanded .collapsed-only {
-      display:none !important;
-    }
+  .desktop .mobile-only {
+    display: none !important;
+  }
 
-    .desktop .mobile-only {
-      display:none !important;
-    }
-
-    .mobile .desktop-only {
-      display:none !important;
-    }
-
+  .mobile .desktop-only {
+    display: none !important;
+  }
 </style>
-
 
 <script>
   Tangere.behaviors.actionhandler = {
@@ -32,23 +28,79 @@
       }
     },
 
-    listeners: {      
-      'tap': '_tapHandler'
+    listeners: {
+      'tap': '_tapHandler',
+      'action': '_actionHandler'
     },
 
-    __getElementPath: function(element) {
+    __getElementPath: function (element) {
       if (element == null) return [];
- 
+
       var pathArr = [element];
- 
-      while(element.parentElement != null) {
+
+      while (element.parentElement != null) {
         element = element.parentElement;
         pathArr.push(element);
       }
- 
-      return pathArr;
-      },
 
+      return pathArr;
+    },
+
+    _getObjPath: function (obj, path) {
+
+      if (!path) return obj;
+      if (!obj) return null;
+
+      var paths = path.split('.'),
+        current = obj;
+
+      for (var i = 0; i < paths.length; ++i) {
+        if (current[paths[i]] == undefined) {
+          return undefined;
+        } else {
+          current = current[paths[i]];
+        }
+      }
+      return current;
+    },
+
+    _setObjPath: function (obj, path, value) {
+
+      if (!path) {
+        obj = value;
+        return obj;
+      }
+
+      if (!obj) obj = {};
+
+      var paths = path.split('.'),
+        current = obj, path = "", container = null;
+
+      for (var i = 0; i < paths.length; ++i) {
+        if (current[paths[i]] == undefined) {
+          current[paths[i]] = {};        
+        }
+        path = paths[i];
+        container = current;
+        current = current[paths[i]];        
+      }
+
+      // update path with new value
+      if (container != null) {
+        container[path] = value;
+      }
+
+      return obj;
+    },
+
+    // handle custom action event
+    _actionHandler: function (e) {
+
+      this._executeAction(e.detail.action, e.detail.args || {});
+
+    },
+
+    // handle tap event, get action from at-click-action attribute
     _tapHandler: function (e) {
 
       var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
@@ -82,13 +134,13 @@
           return false;
         }
       }
-     
+
     },
 
-    _executeAction: function(action, attrs) {
+    _executeAction: function (action, attrs) {
 
-      var handled = false;      
-      var evt = { action: action, args: attrs, model: this.data.model };
+      var handled = false;
+      var evt = { action: action, args: attrs, model: this.data.model };    
       var oldData = this._stringifyJSON(this.data);
 
       // cache action handlers
@@ -114,15 +166,20 @@
           handled = true;
         }
 
-        if (action == "post") {          
+        if (action == "modal") {
+          this._modal(attrs);
+          handled = true;
+        }
+
+        if (action == "post") {
           attrs.atAgentAction = "post";
           handled = true;
         }
       }
 
       // POST to server
-      if (attrs && attrs.atAgentAction) {
-        this.$.post.post({ args: attrs });
+      if (attrs && attrs.atAgentAction && action != "modal") {  // modal will post after modal is closed
+        this.$.post.post({ args: attrs, model: JSON.parse(this._stringifyJSON(this.model)) });
       }
 
       // detect changed data
@@ -135,7 +192,7 @@
     },
 
     // recursive reimplementation of JSON.stringify
-    _stringifyJSON: function(obj) {
+    _stringifyJSON: function (obj) {
 
       // null
       if (obj === null) {
@@ -170,9 +227,17 @@
         var keys = Object.keys(obj);
         if (keys.length) {
           var partialJSON = '';
+          var keyn = [];
 
           for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
+            if (key == "_session" || key == "_card") continue; // _session, _card are static, so exclude (_card will also cause recursion)
+            keyn.push(key);
+          }
+          keys = keyn;
+
+          for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];                       
 
             if (!key || obj[key] === undefined || typeof key === 'function' || typeof obj[key] === 'function') {
 
@@ -200,27 +265,74 @@
       var attr = {};
 
       for (var i = 0, atts = node.attributes, n = atts.length; i < n; i++) {
-        attr[Polymer.CaseMap.dashToCamelCase(atts[i].nodeName)] = atts[i].value ? atts[i].value : true;        
+        attr[Polymer.CaseMap.dashToCamelCase(atts[i].nodeName)] = atts[i].value ? atts[i].value : true;
       }
 
       return attr;
     },
 
-    _dialog: function (args) {
+    _modalValueChanged: function (evt) {
+
+      var args = this.$.modal.args;
+      var oldData = this._stringifyJSON(this.data);
+
+      // update model
+      this._setObjPath(this.model, this.$.modal.modelPath, evt.detail.value);
+            
+
+      // detect changed data
+      if (oldData != this._stringifyJSON(this.data)) {
+        var event = this._createEventObject("_update", null, null, null, this.data);
+        this._invokeActionListeners(event);
+      }
       
+      debugger;
+      if (args && args.atAgentAction) {
+        this.$.post.post({ args: args, model: JSON.parse(this._stringifyJSON(this.model)) });
+      }
+
+    },
+
+    _modal: function (args) {
+
+      var elementName = args.elementName || "at-form-complex/at-form-complex";
+      var schemaUrl = args.schemaUrl || "";
+      var modelPath = args.modelPath || "";
+      var form = this.$.modal;
+
+      var compUrl = this.resolveUrl("../");
+      if (window.ComponentsBase != undefined) compUrl = window.ComponentsBase;
+
+      // resolve relative schemaUrl
+      if (schemaUrl && (schemaUrl.indexOf("/") == -1)) {
+        schemaUrl = compUrl + this.namePrefix + "/" + schemaUrl;
+      }
+
+      form.modelPath = modelPath;
+      form.args = args;
+      form.value = this._getObjPath(this.model, modelPath) || {};
+
+      form.elementName = elementName;
+      if (schemaUrl) form.schemaUrl = schemaUrl;
+     
+      form.open();
+    },
+
+    _dialog: function (args) {
+
       var dialog = args.atDialog || "dialog";
 
       var cardEl = this.model._card.CardComponent;
-      
+
       var p = cardEl.indexOf("/");
       if (p > 0) {
-        cardEl = cardEl.substring(p+1);
+        cardEl = cardEl.substring(p + 1);
       }
 
-       p = cardEl.lastIndexOf("-card");
-      if (p>0) {
+      p = cardEl.lastIndexOf("-card");
+      if (p > 0) {
         cardEl = cardEl.substring(0, p);
-      }          
+      }
 
 
       if (dialog.indexOf("/") > 0) {
@@ -244,7 +356,7 @@
         var cardComponent = document.createElement(element);
 
         if (cardComponent.properties && typeof cardComponent.properties.model != "undefined") {
-          // share model 
+          // share model
           cardComponent.model = this.model;
         }
 
@@ -265,5 +377,27 @@
 
     },
 
+    _apiResponse: function (e) {
+
+      // usually called from at-core-api-post success
+      
+      if (!e.detail.ErrorCode) {
+        var data = e.detail.Data;
+        var keys = Object.keys(e.detail.Data),key="";
+        var oldData = this._stringifyJSON(this.data);
+
+        // copy response data to model
+        for (var i = 0; i < keys.length; i++) {
+          key=keys[i];
+          this.model[key] = data[key];
+        }
+
+        // detect changed data
+        if (oldData != this._stringifyJSON(this.data)) {
+          var event = this._createEventObject("_update", null, null, null, this.data);
+          this._invokeActionListeners(event);
+        }
+      }
+    }
   };
 </script>
