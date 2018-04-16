@@ -103,9 +103,16 @@
 
     actionListener: function (event) {
       
+      var oldModel = this.model;
+
       // we now only use the "real" model
       this.model = event.detail.model.state.model;
 
+      // if this.model is unchanged then a "deep" change happened
+      // and modelBind needs to invoked directly
+      if (oldModel == this.model) {
+        this._bindModel(this.model, this.modelBind);
+      }
     },
 
     __getElementPath: function (element) {

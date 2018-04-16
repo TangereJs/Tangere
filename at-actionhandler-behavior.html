@@ -285,8 +285,7 @@
         var event = this._createEventObject("_update", null, null, null, this.data);
         this._invokeActionListeners(event);
       }
-      
-      debugger;
+
       if (args && args.atAgentAction) {
         this.$.post.post({ args: args, model: JSON.parse(this._stringifyJSON(this.model)) });
       }
