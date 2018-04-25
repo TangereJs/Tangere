@@ -1,6 +1,6 @@
 {
   "name": "tangere",
-  "version": "0.0.1.221",
+  "version": "0.0.1.227",
   "private": true,
   "dependencies": {
     "polymer": "Polymer/polymer#master"
