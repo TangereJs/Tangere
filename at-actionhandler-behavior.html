@@ -202,9 +202,9 @@
       // unstringifiable - functions and undefined
       if (obj === undefined || obj.constructor === Function) { return; }
 
-      // strings
+      // escape string value
       if (obj.constructor === String) {
-        return '"' + obj + '"';
+        return JSON.stringify(obj);        
       }
 
       // arrays
@@ -215,7 +215,6 @@
           for (var i = 0; i < obj.length; i++) {
             partialJSON.push(this._stringifyJSON(obj[i])); // recursion
           }
-
           return '[' + partialJSON.join(",") + ']';
         } else {
           return '[]';
