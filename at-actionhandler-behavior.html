@@ -180,12 +180,12 @@
       // POST to server
       if (attrs && attrs.atAgentAction && action != "modal") {  // modal will post after modal is closed
 
-        if (attr.atAgentAction == "nextpage") {
+        if (attrs.atAgentAction == "nextpage") {
           this.$.post.post({ args: attrs });  // *todo* decide how to control if model should be included or not by default, and/or how to control per action
         } else {
           this.$.post.post({ args: attrs, model: JSON.parse(this._stringifyJSON(this.model)) });
         }
-      }
+      } 
 
       // detect changed data
       if (oldData != this._stringifyJSON(this.data)) {
