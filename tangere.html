@@ -222,7 +222,8 @@
 
     };
 
-    var nativeShadow = Polymer.Settings.useNativeShadow;
+    // In Polymer 2.x Polymer.Settings.useNativeShadow is undefined but Polymer.Settings.useShadow is true
+    var nativeShadow = Polymer.Settings.useNativeShadow || Polymer.Settings.useShadow;
     
     scope.Base.scopeSubtree = function (container, shouldObserve) {
       if (nativeShadow) {
