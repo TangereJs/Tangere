@@ -236,21 +236,27 @@
           // we change the modification to class attribute to 
           // var className = node.getAttribute('class');
           // node.setAttribute('class', self._scopeElementClass(node, className));
-      
+
           // to modification to classList property
-          node.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
+          // StyleTransformer doens't exist in Polymer 2.x only 1.x
+          if (Polymer.StyleTransformer !== undefined) {
+            node.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
+          } else {
+            // for Polymer 2.x where necessary add style-scope manually
+            node.classList.add('style-scope');
+          }
           node.classList.add(self.is);
 
           // BUG 2. in shadyDom querySelectorAll returns children from shadyDOM
           // and causes children from shadyDOM to get scoped with css from parent
           // var n$ = node.querySelectorAll('*');
-          
+
           // solution is 
           var n$ = Polymer.dom(node).children;
           // because Polymer.dom(...).children doesn't return elements from shadyDom
           // if elements from shadyDom should be processed, then a call to 
           // Polymer.dom(node.root).children should be used
-          
+
           for (var i = 0, n; i < n$.length && (n = n$[i]); i++) {
             // BUG 1. class attribute change
             // we change the modification to class attribute to 
@@ -258,9 +264,15 @@
             // n.setAttribute('class', self._scopeElementClass(n, className));
 
             // to modification to classList property
-            n.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
+            // StyleTransformer doens't exist in Polymer 2.x only 1.x
+            if (Polymer.StyleTransformer !== undefined) {
+              n.classList.add(Polymer.StyleTransformer.SCOPE_NAME);
+            } else {
+              // for Polymer 2.x where necessary add style-scope manually
+              n.classList.add('style-scope');
+            }
             n.classList.add(self.is);
-            
+
             // BUG 2. subree traversal fix
             // Polymer.dom(...).children only returns nodes direct children, it doesn't
             // return the whole subtree tree. We traverse and scope the subree tree manually
