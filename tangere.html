@@ -277,7 +277,7 @@
             // Polymer.dom(...).children only returns nodes direct children, it doesn't
             // return the whole subtree tree. We traverse and scope the subree tree manually
             var nChilds = Polymer.dom(n).children;
-            nChilds.forEach(function(nChild) { 
+            Array.prototype.forEach.call(nChilds, function(nChild) { 
               scopify(nChild);
             });
           }
