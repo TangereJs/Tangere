@@ -102,7 +102,7 @@
 
     // handle tap event, get action from at-click-action attribute
     _tapHandler: function (e) {
-
+      
       var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
 
       if (!p || p.length == 0) return;
@@ -125,7 +125,7 @@
       var attrs = this._getNodeAttributes(src);
 
       if (attrs.atClickAction) {
-        let handled = this._executeAction(attrs.atClickAction, attrs);
+        let handled = this._executeAction(attrs.atClickAction, attrs, src, e.target);
 
         // event is handled here, so stop propagation
         if (handled) {
@@ -137,10 +137,10 @@
 
     },
 
-    _executeAction: function (action, attrs) {
+    _executeAction: function (action, attrs, srcElement, targetElement) {
 
       var handled = false;
-      var evt = { action: action, args: attrs, model: this.data.model };    
+      var evt = { action: action, args: attrs, model: this.data.model, srcElement: srcElement, targetElement: targetElement };
       var oldData = this._stringifyJSON(this.data);
 
       // cache action handlers
