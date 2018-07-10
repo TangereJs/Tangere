@@ -30,6 +30,8 @@
 
     listeners: {
       'tap': '_tapHandler',
+      'change': '_changeHandler',
+      'input': '_inputHandler',
       'action': '_actionHandler'
     },
 
@@ -95,21 +97,35 @@
 
     // handle custom action event
     _actionHandler: function (e) {
-
       this._executeAction(e.detail.action, e.detail.args || {});
-
     },
 
     // handle tap event, get action from at-click-action attribute
     _tapHandler: function (e) {
-      
+      return this.__eventHandler("at-click-action", e);
+    },
+
+    // handle native change event, get action from at-change-action attribute
+    _changeHandler: function (e) {      
+      return this.__eventHandler("at-change-action", e);
+    },
+
+    // handle native change event, get action from at-change-action attribute
+    _inputHandler: function (e) {
+      return this.__eventHandler("at-input-action", e);
+    },
+
+    __eventHandler: function (handlerName, e) {
+
+      var attrName = Polymer.CaseMap.dashToCamelCase(handlerName);
+
       var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
 
       if (!p || p.length == 0) return;
 
       for (var i = 0; i < p.length; i++) {
         n = p[i];
-        if (n.getAttribute("at-click-action") != null) {
+        if (n.getAttribute != undefined && n.getAttribute(handlerName) != null) {
           // found source node with tap-event attribute
           src = n;
           break;
@@ -124,9 +140,9 @@
 
       var attrs = this._getNodeAttributes(src);
 
-      if (attrs.atClickAction) {
-        let handled = this._executeAction(attrs.atClickAction, attrs, src, e.target);
-
+      if (attrs[attrName]) {
+        let handled = this._executeAction(attrs[attrName], attrs, src, e.target);
+      
         // event is handled here, so stop propagation
         if (handled) {
           e.preventDefault();
