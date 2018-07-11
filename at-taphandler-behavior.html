@@ -50,7 +50,7 @@
 
       for (var i = 0; i < p.length; i++) {
         n = p[i];
-        if (n.getAttribute("tap-event") != null) {
+        if (n.getAttribute != undefined && n.getAttribute("tap-event") != null) {
           // found source node with tap-event attribute
           src = n;
           break;
