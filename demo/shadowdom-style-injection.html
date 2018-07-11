@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>shadowDOM style injection demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../polymer/polymer.html">
+  <link rel="import" href="shadowdom-style-injection-elt.html">
+</head>
+
+<body>
+  <h3>shadowDOM style injection demo</h3>
+  
+  <shadowdom-style-injection-elt></shadowdom-style-injection-elt>
+
+  <script> document.addEventListener('WebComponentsReady', function() { 
+    console.log('    webcomponents ready');
+    
+  }); </script>
+</body>
+
+</html>

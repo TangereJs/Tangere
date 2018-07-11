@@ -1,0 +1,102 @@
+<link rel="import" href="../tangere.html" />
+
+<dom-module id="shadowdom-style-injection-modal-elt">
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+
+        margin: 8px;
+        padding: 8px;
+        border: 1px dashed purple;
+      }
+    </style>
+    <div>I am shadowdom-style-injection-modal-elt</div>
+    <slot></slot>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "shadowdom-style-injection-modal-elt",
+    properties: {
+
+    },
+    
+    ready: function() {
+    }
+  });
+</script>
+
+<dom-module id="shadowdom-style-injection-elt">
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+        
+        margin: 8px;
+        padding: 8px;
+        border: 1px dashed plum;
+      }
+
+      .slot-child {
+        margin: 8px;
+        padding: 8px;
+        border: 1px dashed blue;
+      }
+
+      ::slotted(.slot-child) {
+        margin: 8px;
+        padding: 8px;
+        border: 1px dashed blue;
+      }
+    </style>
+    <div>I am shadowdom-style-injection-elt</div>
+    <button on-click="_handleToggleToBody">Move modal to document.body</button>
+    <shadowdom-style-injection-modal-elt id="modal">
+      <div class="slot-child">Slot distributed child</div>
+    </shadowdom-style-injection-modal-elt>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "shadowdom-style-injection-elt",
+    properties: {
+
+    },
+    ready: function() {
+    },
+    _handleToggleToBody: function(event) {
+      var target = event.target;
+
+      if (this._lastParentElement == undefined) {
+        this._lastParentElement = this.parentNode;
+        
+        this.root.removeChild(this.$.modal);
+        document.body.appendChild(this.$.modal);
+        
+        var styleText = this.root.firstChild.textContent;
+        var modalStyleText = this.$.modal.root.firstChild.textContent;
+        if (this._originalModalStyle == undefined) {
+          this._originalModalStyle = modalStyleText;
+        }
+        var combined = styleText + '\n' + modalStyleText;
+
+        this.$.modal.root.firstChild.textContent = combined;
+
+        target.textContent = "Return modal to me";
+      
+      } else {
+        document.body.removeChild(this.$.modal);
+        this.root.appendChild(this.$.modal);
+        this._lastParentElement = undefined;
+
+        this.$.modal.root.firstChild.textContent = this._originalModalStyle;
+
+        target.textContent = "Move modal to document.body";
+      }
+
+    }
+  });
+</script>
