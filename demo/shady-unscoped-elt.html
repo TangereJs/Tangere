@@ -1,0 +1,42 @@
+<link rel="import" href="../tangere.html" />
+<dom-module id="shady-unscoped-elt">
+  <template>
+    <style shady-unscoped>
+      .unscoped-style {
+        padding: 8px;
+        margin: 8px;
+        border: 1px solid purple;
+      }
+    </style>
+    
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+
+        padding: 8px;
+        margin: 8px;
+        border: 1px solid green;
+      }
+
+      .shadow-dom-scoped {
+        padding: 8px;
+        margin: 8px;
+        border: 1px solid red;
+      }
+    </style>
+
+    <div class="shadow-dom-scoped">I am styled from shadow-dom</div>
+    <div class="unscoped-style">I am styled by shady-unscoped style</div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "shady-unscoped-elt",
+    properties: {
+
+    },
+    ready: function() {
+    }
+  });
+</script>
