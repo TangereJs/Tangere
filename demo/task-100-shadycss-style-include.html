@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>main document demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../tangere/tangere.html">
+  <link rel="import" href="gitlab-task-100-elt1.html">
+  <link rel="import" href="gitlab-task-100-elt2.html">
+</head>
+
+<body>
+  <div>Polymer.version =
+    <span id="verVal"></span>
+  </div>
+
+  <gitlab-task-100-elt1></gitlab-task-100-elt1>
+  <gitlab-task-100-elt2></gitlab-task-100-elt2>
+
+  <script> document.addEventListener('WebComponentsReady', function() {
+      console.log('webcomponents ready');
+      var verVal = document.getElementById('verVal');
+      verVal.textContent = Polymer.version;
+    }); </script>
+</body>
+
+</html>
