@@ -1,0 +1,56 @@
+<link rel="import" href="../../tangere/tangere.html" />
+<link rel="import" href="ie11-apply-css-mixin-styles-type1.html" />
+<link rel="import" href="ie11-apply-css-mixin-styles-type2.html" />
+<link rel="import" href="ie11-apply-css-mixin-styles-type3.html" />
+<link rel="import" href="ie11-apply-css-mixin-styles-type4.html" />
+
+<dom-module id="ie11-apply-css-mixin-elt">
+  <template>
+    <style include="ie11-apply-css-mixin-styles-type1"></style>
+    <style include="ie11-apply-css-mixin-styles-type2"></style>
+    <style include="ie11-apply-css-mixin-styles-type3"></style>
+    <style include="ie11-apply-css-mixin-styles-type4"></style>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+      }
+
+      .styled-with-css-mixin-type1 {
+        @apply --css-mixin-style-type1;
+      }
+
+      .styled-with-css-mixin-type2 {
+        @apply --css-mixin-style-type2;
+      }
+
+      .styled-with-css-mixin-type3 {
+        @apply --css-mixin-style-type3;
+      }
+
+      .styled-with-css-mixin-type4 {
+        @apply --css-mixin-style-type4;
+      }
+    </style>
+    <content></content>
+
+    <div> Polymer version is: <span>[[version]]</span></div>
+    <div class="styled-with-css-mixin-type1">I am styled with css mixin</div>
+    <div class="styled-with-css-mixin-type2">I am styled with css mixin</div>
+    <div class="styled-with-css-mixin-type3">I am styled with css mixin</div>
+    <div class="styled-with-css-mixin-type4">I am styled with css mixin</div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "ie11-apply-css-mixin-elt",
+    properties: {
+      version: {
+        type: String,
+        value: Polymer.version
+      }
+    },
+    ready: function() {
+    }
+  });
+</script>
