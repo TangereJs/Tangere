@@ -6,18 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dom-if exists demo</title>
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="ie11-apply-css-mixin-elt.html">
+  <link rel="import" href="ie11-apply-css-mixin/declarative-elt.html">
 </head>
 
 <body>
   <h3>Dom if demo</h3>
-  <ie11-apply-css-mixin-elt></ie11-apply-css-mixin-elt>
+  <declarative-elt title="I am an element created declaratively"></declarative-elt>
 
-  <script> document.addEventListener('WebComponentsReady', function() { 
-    console.log('    webcomponents ready');
-    
-  }); </script>
+  <script> 
+    document.addEventListener('WebComponentsReady', function() {
+      console.log('webcomponents ready');
+
+      var elt = document.createElement('declarative-elt');
+      elt.title = "I am en element created at runtime";
+
+      document.body.appendChild(elt);
+
+    }); 
+  </script>
 </body>
 
 </html>
-
