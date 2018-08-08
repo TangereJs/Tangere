@@ -1,0 +1,50 @@
+<link rel="import" href="../../../tangere/tangere.html" />
+
+<link rel="import" href="runtime-styles-type1.html" />
+<link rel="import" href="runtime-styles-type2.html" />
+<link rel="import" href="runtime-styles-type3.html" />
+<link rel="import" href="runtime-styles-type4.html" />
+<link rel="import" href="runtime-style-module-type1.html" />
+<link rel="import" href="runtime-style-module-type2.html" />
+
+<dom-module id="runtime-csc-elt">
+  <template>
+    <style include="at-core-style-classes">
+      :host {
+        display: block;
+        box-sizing: border-box;
+
+        margin: 8px;
+        padding: 8px;
+        border: 1px solid violet;
+      }
+    </style>
+
+    <div class="font-title">[[title]]</div>
+    <div class="font-display1">I am styled with css mixin type1</div>
+    <div class="font-display2">I am styled with css mixin type2</div>
+    <div class="font-display3">I am styled with css mixin type3</div>
+    <div class="font-display4">I am styled with css mixin type4</div>
+    <div class="font-headline">I am styled with css style module type1</div>
+    <div class="font-subhead">I am styled with css style module type2</div>
+    <div> Polymer version is:<span>[[version]]</span></div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "runtime-csc-elt",
+    properties: {
+      version: {
+        type: String,
+        value: Polymer.version
+      },
+
+      title: {
+        type: String,
+        value: ''
+      }
+    },
+    ready: function() {
+    }
+  });
+</script>

@@ -1,0 +1,57 @@
+<link rel="import" href="../../../tangere/tangere.html" />
+<link rel="import" href="../../../at-core-style-classes/at-core-style-classes.html" />
+
+<link rel="import" href="runtime-csc-elt.html" />
+
+<dom-module id="declarative-csc-elt">
+  <template>
+    <style include="at-core-style-classes">
+      :host {
+        display: block;
+        box-sizing: border-box;
+
+        margin: 8px;
+        padding: 8px;
+        border: 1px solid purple;
+      }
+    </style>
+
+    <div class="font-title">[[title]]</div>
+    <div class="layout-horizontal">
+      <div class="flex-6">
+        <div class="font-display1">I am styled with css mixin type1</div>
+        <div class="font-display2">I am styled with css mixin type2</div>
+        <div class="font-display3">I am styled with css mixin type3</div>
+        <div class="font-display4">I am styled with css mixin type4</div>
+        <div class="font-headline">I am styled with css style module type1</div>
+        <div class="font-subhead">I am styled with css style module type2</div>
+      </div>
+      <div id="insert" class="flex-6">
+
+      </div>
+    </div>
+    <div> Polymer version is: <span>[[version]]</span></div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "declarative-csc-elt",
+    properties: {
+      version: {
+        type: String,
+        value: Polymer.version
+      },
+
+      title: {
+        type: String,
+        value: ''
+      }
+    },
+    ready: function() {
+      var elt = document.createElement('runtime-csc-elt');
+      elt.title = "I am an element created from another element at runtime that uses at-core-style-classes";
+
+      Polymer.dom(this.$.insert).appendChild(elt);
+    }
+  });
+</script>
