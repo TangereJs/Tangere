@@ -298,5 +298,35 @@
       }
     };
 
+    // in IE11, directly setting .className property breaks polymer styling computation
+    // so for IE11 we need to remove all class names from class list before setting new ones
+    scope.Base._setClassList = function(elt, newClasses) {
+      var toAdd = [];
+      var cl = elt.classList;
+
+      // remove class names from class list but keep the ones that do style-scoping
+      for( var i = cl.length; i > 0; i-- ) {
+        var cn = cl[0];
+        
+        // we want to keep "x-scope", "style-scope" and "start-now-" class names so that style scoping works correctly
+        if (cn === "x-scope") toAdd.push(cn);
+        if (cn.indexOf("start-now-") > -1) toAdd.push(cn);
+        if (cn.indexOf("style-scope") > -1) toAdd.push(cn);
+
+        cl.remove( cn );
+      }
+
+      // compute individual class names from newClasses
+      var newClassesList = newClasses.split(" ");
+      for(var i=0; i < newClassesList.length; i++) {
+        toAdd.push(newClassesList[i]);
+      }
+      
+      // add new class names to class list
+      for (var i = 0; i < toAdd.length; i++) {
+        cl.add(toAdd[i]);
+      }
+    }
+
   })(Polymer);
 </script>
