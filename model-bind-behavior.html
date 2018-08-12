@@ -31,6 +31,15 @@
       }
     },
 
+    _updateModel: function(n) {
+      if (n == this.model) {
+        // model reference did nor change --> force reevaluation of modelBind        
+        this._bindModel(this.model, this.modelBind); 
+      } else {
+        this.model = n;
+      }
+    },
+
     _bindModel: function(model,modelBind) {
 
       var i = 0;
