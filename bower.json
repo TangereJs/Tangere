@@ -3,6 +3,6 @@
   "version": "0.0.1.266",
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#master"
+    "polymer": "Polymer/polymer#^2.0.0"
   }
 }
