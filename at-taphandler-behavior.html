@@ -44,7 +44,7 @@
 
     _tapHandler: function (e) {
  
-      var p = e.path || this.__getElementPath(e.target), i = 0, n = null, src = null;
+      var p = Polymer.dom(e).path || this.__getElementPath(e.target), i = 0, n = null, src = null;
 
       if (!p || p.length == 0) return;
 
