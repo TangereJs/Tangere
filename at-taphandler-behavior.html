@@ -69,6 +69,21 @@
       if (event == "dialog") this._dialog(data);
       if (event == "container-mode") this._containerMode(data);
       
+      // 
+      // For the expanded/collapsed functionallity and cisco-youtube-card where at-core-carousel element is present
+      // on expanded we need to reset resize sensor of at-core-carousel
+      // this in this function is cisco-youtube-card element and we need to select core-dashboard first and then select carousel-within
+      //
+      if (data == "expanded") {
+        var dashboard = Polymer.dom(this.root).querySelector('at-core-dashboard');
+        if (dashboard) {
+          var carousel = Polymer.dom(dashboard.root).querySelector('at-core-carousel');
+          if (carousel && carousel.resetResizeSensor) {
+            carousel.resetResizeSensor();
+          }
+        }
+      }
+
       // event is handled here, so stop propagation
       e.preventDefault();
       e.stopPropagation();
