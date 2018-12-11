@@ -65,9 +65,10 @@
 
       var event = src.getAttribute("tap-event");
       var data = src.getAttribute("tap-event-data");
+      var expandMode = src.getAttribute("tap-event-expand-mode");
 
       if (event == "dialog") this._dialog(data);
-      if (event == "container-mode") this._containerMode(data);
+      if (event == "container-mode") this._containerMode(data, expandMode);
       
       // 
       // For the expanded/collapsed functionallity and cisco-youtube-card where at-core-carousel element is present
@@ -90,12 +91,19 @@
       return false;
     },
 
-    _containerMode: function (data) {
+    _containerMode: function (data, expandMode) {
 
       if (!this.$.container) return;
 
       this.toggleClass("expanded", data == "expanded", this.$.container);
       this.toggleClass("collapsed", data == "collapsed", this.$.container);
+
+      var openModal = data.expandMode == "1" || (data.expandMode == "2" && Tangere.session.browser.mobile);
+
+      if (openModal) {
+        var coreModal = document.createElement('at-core-modal');
+        coreModal.open(this.$.container);
+      }
 
       this.async(function () {
 
