@@ -101,8 +101,13 @@
       var openModal = expandMode == "1" || (expandMode == "2" && Tangere.session.browser.mobile);
 
       if (openModal) {
-        var coreModal = document.createElement('at-core-modal');
-        coreModal.open(this.$.container);
+        if (!this.__lastUsedModal) {
+          var coreModal = document.createElement('at-core-modal');
+          this.__lastUsedModal = coreModal;
+        }
+        
+        if (this.__lastUsedModal.isOpen) return;
+        this.__lastUsedModal.open(this);
       }
 
       this.async(function () {
