@@ -98,7 +98,7 @@
       this.toggleClass("expanded", data == "expanded", this.$.container);
       this.toggleClass("collapsed", data == "collapsed", this.$.container);
 
-      var openModal = data.expandMode == "1" || (data.expandMode == "2" && Tangere.session.browser.mobile);
+      var openModal = expandMode == "1" || (expandMode == "2" && Tangere.session.browser.mobile);
 
       if (openModal) {
         var coreModal = document.createElement('at-core-modal');
