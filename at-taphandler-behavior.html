@@ -104,10 +104,24 @@
         if (!this.__lastUsedModal) {
           var coreModal = document.createElement('at-core-modal');
           this.__lastUsedModal = coreModal;
+          
+          var root = this.$.container.root;
+          coreModal.addEventListener('close-modal', function() {
+            var cardTitle = Polymer.dom(root).querySelector('at-carbon-card-title');
+            if (cardTitle != null) {
+              Polymer.dom(cardTitle).removeAttribute('hidden');
+            }
+          });
         }
         
         if (this.__lastUsedModal.isOpen) return;
         this.__lastUsedModal.open(this);
+
+        var cardTitle = Polymer.dom(this.$.container.root).querySelector('at-carbon-card-title');
+        if (cardTitle != null) {
+          this.__lastUsedModal.title = cardTitle.label;
+          Polymer.dom(cardTitle).setAttribute('hidden', '');
+        }
       }
 
       this.async(function () {
