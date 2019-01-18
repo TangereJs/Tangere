@@ -104,6 +104,15 @@
         if (!this.__lastUsedModal) {
           var coreModal = document.createElement('at-core-modal');
           this.__lastUsedModal = coreModal;
+          var container = this.$.container;
+          var self = this;
+          
+          coreModal.addEventListener('close-modal', function() {
+            var cardFooter = Polymer.dom(container.root).querySelector('at-carbon-card-footer');
+            if (cardFooter != null) {
+              cardFooter.value = false;
+            }
+          });
         }
         
         if (this.__lastUsedModal.isOpen && data == "collapsed") {
