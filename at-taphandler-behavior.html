@@ -112,6 +112,11 @@
             if (cardFooter != null) {
               cardFooter.value = false;
             }
+            
+            var coreVlist = Polymer.dom(container.root).querySelector('at-core-vlist');
+            if (coreVlist != null) {
+              coreVlist.scrollMode = self._previousScrollMode;
+            }
           });
         }
         
@@ -130,6 +135,12 @@
         if (cardTitle != null) {
           this.__lastUsedModal.title = cardTitle.label;
           Polymer.dom(cardTitle).setAttribute('hidden', '');
+        }
+
+        var coreVlist = Polymer.dom(this.$.container.root).querySelector('at-core-vlist');
+        if (coreVlist != null) {
+          this._previousScrollMode = coreVlist.scrollMode;
+          coreVlist.scrollMode = data == "expanded" ? 0 : 1;
         }
       }
 
