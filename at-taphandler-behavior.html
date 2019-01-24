@@ -112,7 +112,12 @@
             if (cardFooter != null) {
               cardFooter.value = false;
             }
-            
+
+            var cardTitle = Polymer.dom(container.root).querySelector('at-carbon-card-title');
+            if (cardTitle != null) {
+              Polymer.dom(cardTitle).removeAttribute('hidden');
+            }
+
             var coreVlist = Polymer.dom(container.root).querySelector('at-core-vlist');
             if (coreVlist != null) {
               coreVlist.scrollMode = self._previousScrollMode;
