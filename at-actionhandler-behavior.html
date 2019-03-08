@@ -411,6 +411,8 @@
           this.model[key] = data[key];
         }
 
+        if (this.model._action) this.model._action.request = ""; // clear name of peninding request
+
         // detect changed data
         if (oldData != this._stringifyJSON(this.data)) {
           var event = this._createEventObject("_update", null, null, null, this.data);
