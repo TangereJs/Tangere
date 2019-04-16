@@ -202,14 +202,22 @@
           this.$.post.post({ args: attrs, model: JSON.parse(this._stringifyJSON(this.model)) });
         }
       } 
-
       // detect changed data
-      if (oldData != this._stringifyJSON(this.data)) {
-        var event = this._createEventObject("_update", null, null, null, this.data);
-        this._invokeActionListeners(event);
-      }
+      this._handleModelChanged(this.data, oldData);
 
       return handled;
+    },
+
+    _handleModelChanged: function(data, oldData) {
+      if(this.stateName != "") {
+        Polymer.signal('state-changed', {
+          data: data,
+          stateName: this.stateName
+        });
+      } else {
+        var event = this._createEventObject("_update", null, null, null, data);
+        this._invokeActionListeners(event);
+      }
     },
 
     // recursive reimplementation of JSON.stringify
@@ -414,10 +422,7 @@
         if (this.model._action) this.model._action.request = ""; // clear name of peninding request
 
         // detect changed data
-        if (oldData != this._stringifyJSON(this.data)) {
-          var event = this._createEventObject("_update", null, null, null, this.data);
-          this._invokeActionListeners(event);
-        }
+        this._handleModelChanged(this.data, oldData);
       }
     }
   };
