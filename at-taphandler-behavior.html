@@ -1,49 +1,45 @@
 <link rel="import" href="../tangere/tangere.html">
 
-
 <style>
+  .collapsed .expanded-only {
+    display: none !important;
+  }
 
-    .collapsed .expanded-only {
-      display: none !important;
-    }
+  .expanded .collapsed-only {
+    display: none !important;
+  }
 
-    .expanded .collapsed-only {
-      display:none !important;
-    }
+  .desktop .mobile-only {
+    display: none !important;
+  }
 
-    .desktop .mobile-only {
-      display:none !important;
-    }
-
-    .mobile .desktop-only {
-      display:none !important;
-    }
-
+  .mobile .desktop-only {
+    display: none !important;
+  }
 </style>
-
 
 <script>
   Tangere.behaviors.taphandler = {
 
-    listeners: {      
+    listeners: {
       'tap': '_tapHandler'
     },
 
-    __getElementPath: function(element) {
+    __getElementPath: function (element) {
       if (element == null) return [];
- 
+
       var pathArr = [element];
- 
-      while(element.parentElement != null) {
+
+      while (element.parentElement != null) {
         element = element.parentElement;
         pathArr.push(element);
       }
- 
+
       return pathArr;
-      },
+    },
 
     _tapHandler: function (e) {
- 
+
       var p = Polymer.dom(e).path || this.__getElementPath(e.target), i = 0, n = null, src = null;
 
       if (!p || p.length == 0) return;
@@ -67,10 +63,10 @@
       var data = src.getAttribute("tap-event-data");
       var expandMode = src.getAttribute("tap-event-expand-mode");
 
-      if (event == "dialog") this._dialog(data);
+      if (event == "dialog") this._dialog(data, src);
       if (event == "container-mode") this._containerMode(data, expandMode);
-      
-      // 
+
+      //
       // For the expanded/collapsed functionallity and cisco-youtube-card where at-core-carousel element is present
       // on expanded we need to reset resize sensor of at-core-carousel
       // this in this function is cisco-youtube-card element and we need to select core-dashboard first and then select carousel-within
@@ -106,8 +102,8 @@
           this.__lastUsedModal = coreModal;
           var container = this.$.container;
           var self = this;
-          
-          coreModal.addEventListener('close-modal', function() {
+
+          coreModal.addEventListener('close-modal', function () {
             var cardFooter = Polymer.dom(container.root).querySelector('at-carbon-card-footer');
             if (cardFooter != null) {
               cardFooter.value = false;
@@ -124,7 +120,7 @@
             }
           });
         }
-        
+
         if (this.__lastUsedModal.isOpen && data == "collapsed") {
           var cardTitle = Polymer.dom(this.$.container.root).querySelector('at-carbon-card-title');
           if (cardTitle != null) {
@@ -132,7 +128,7 @@
           }
           this.__lastUsedModal.close();
           return;
-        } 
+        }
 
         this.__lastUsedModal.open(this);
 
@@ -153,7 +149,7 @@
 
         var dashboard = this.$.container;
         if (this.$.container.tagName.toUpperCase() != "AT-CORE-DASHBOARD") dashboard = dashboard.querySelector('at-core-dashboard');
-        if (dashboard) { 
+        if (dashboard) {
           dashboard.refresh();
         }
       }, 100);
@@ -161,15 +157,16 @@
       this.fire('content-changed', this, { bubbles: true });
     },
 
-    _dialog: function (data) {
-  
+    _dialog: function (data, srcNode) {
+
       var args = (data || "").split("|");
       var dialog = args[0] || "dialog";
+      var dialogTitle = srcNode.getAttribute("dialog-title") || "";
 
       var cardEl = this.tagName.toLowerCase();
 
       var p = cardEl.lastIndexOf("-card");
-      if (p>0) {
+      if (p > 0) {
         cardEl = cardEl.substring(0, p);
       }
 
@@ -194,7 +191,7 @@
         var cardComponent = document.createElement(element);
 
         if (cardComponent.properties && typeof cardComponent.properties.model != "undefined") {
-          // share model 
+          // share model
           cardComponent.model = this.model;
         }
 
@@ -204,6 +201,7 @@
         Polymer.dom.flush();
 
         this.$.dialog.name = element;
+        this.$.dialog.title = dialogTitle;
         this.$.dialog.open();
 
       }, function (err) {
