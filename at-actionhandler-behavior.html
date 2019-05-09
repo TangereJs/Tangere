@@ -412,17 +412,20 @@
         var data = e.detail.Data;
         var keys = Object.keys(e.detail.Data),key="";
         var oldData = this._stringifyJSON(this.data);
-
+        
         // copy response data to model
         for (var i = 0; i < keys.length; i++) {
           key=keys[i];
           this.model[key] = data[key];
         }
 
-        if (this.model._action) this.model._action.request = ""; // clear name of peninding request
+        if (this.model._action) this.model._action.request = ""; // clear name of peninding request             
 
         // detect changed data
         this._handleModelChanged(this.data, oldData);
+
+        // call callback action
+        this._executeAction("callback");
       }
     }
   };
