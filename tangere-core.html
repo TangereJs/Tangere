@@ -38,6 +38,18 @@
       return browser;
     }
 
+    // replace {{vars}} in node innerHTML
+    Tangere.render = function render(nodeOrId, model) {
+      var node = nodeOrId;
+      if (typeof nodeOrId == "string") node = document.getElementById(nodeOrId);     
+      var template = node.innerHTML;
+      template = template.replace(/\{\{\s?([\w.]+)\s?\}\}/g, function (match, variable) {
+        return variable.split('.').reduce(function (previous, current) {
+          return previous[current];
+        }, model) || '';
+      });
+      node.innerHTML = template;
+    }
 
     // disable async in chrome as a workaround for https://github.com/Polymer/polymer/issues/2522 
     var _importHref = scope.Base.importHref;
@@ -207,6 +219,7 @@
         return result;
       };
     };
+
     // -- global repository for languages
     scope.atI18nLocales = Polymer.atI18nLocales || {
 
@@ -240,6 +253,7 @@
             // for Polymer 2.x where necessary add style-scope manually
             node.classList.add('style-scope');
           }
+
           node.classList.add(self.is);
 
           // BUG 2. in shadyDom querySelectorAll returns children from shadyDOM
