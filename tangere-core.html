@@ -41,7 +41,8 @@
     // replace {{vars}} in node innerHTML
     Tangere.render = function render(nodeOrId, model) {
       var node = nodeOrId;
-      if (typeof nodeOrId == "string") node = document.getElementById(nodeOrId);     
+      if (typeof nodeOrId == "string") node = document.getElementById(nodeOrId);
+      if (!node) return;
       var template = node.innerHTML;
       template = template.replace(/\{\{\s?([\w.]+)\s?\}\}/g, function (match, variable) {
         return variable.split('.').reduce(function (previous, current) {
