@@ -208,7 +208,11 @@
       return handled;
     },
 
-    _handleModelChanged: function(data, oldData) {
+    _handleModelChanged: function (data, oldData) {
+
+      // ignore unchanged data
+      if (oldData == this._stringifyJSON(data)) return;
+
       if(this.stateName != "") {
         Polymer.signal('state-changed', {
           data: data,
