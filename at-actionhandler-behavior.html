@@ -1,4 +1,3 @@
-<link rel="import" href="../tangere/tangere.html">
 
 <style>
   .collapsed .expanded-only {
@@ -154,6 +153,32 @@
     },
 
     _executeAction: function (action, attrs, srcElement, targetElement) {
+     
+      this._action = { action: action, attrs: attrs, srcElement: srcElement, targetElement: targetElement };
+
+      if (attrs && attrs["confirmMessage"]) {
+           
+        this.$.alertElement.message = attrs["confirmMessage"];
+
+        this.$.alertElement.addEventListener('confirm', function () {
+
+          this.async(function () {
+            this.__executeAction(this._action.action, this._action.attrs, this._action.srcElement, this._action.targetElement);
+          });          
+
+        }.bind(this), { once: true });
+
+        this.$.alertElement.open();
+        return true;
+
+      } else {
+
+        return this.__executeAction(this._action.action, this._action.attrs, this._action.srcElement, this._action.targetElement);
+
+      }
+    },
+
+    __executeAction: function (action, attrs, srcElement, targetElement) {
 
       var handled = false;
       var evt = { action: action, args: attrs, model: this.data.model, srcElement: srcElement, targetElement: targetElement, container: this.$, connector: this.$.post };
