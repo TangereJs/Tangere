@@ -181,7 +181,7 @@
     __executeAction: function (action, attrs, srcElement, targetElement) {
 
       var handled = false;
-      var evt = { action: action, args: attrs, model: this.data.model, srcElement: srcElement, targetElement: targetElement, container: this.$, connector: this.$.post };
+      var evt = { action: action, args: attrs, model: this.data.model, srcElement: srcElement, targetElement: targetElement, container: this.$, connector: this.$.post, containerExpanded: this.renderMode == "expanded" };
       var oldData = this._stringifyJSON(this.data);
 
       // cache action handlers

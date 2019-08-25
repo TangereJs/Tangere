@@ -21,8 +21,29 @@
 <script>/** @polymerBehavior Tangere.behaviors.taphandler */
   Tangere.behaviors.taphandler = {
 
+    properties: {
+      containerMode: {
+        type: String,
+        notify: true,
+        value: "collapsed",
+        observer: "_containerModeChanged"
+      }
+    },
+
     listeners: {
       'tap': '_tapHandler'
+    },
+
+
+    _containerModeChanged: function (n, o) {
+    
+      // logic should be moved to a card specific mixin
+      if (this.$.container) {
+        this.toggleClass("expanded", n == "expanded", this.$.container);
+        this.toggleClass("collapsed", n == "collapsed" || !n, this.$.container);
+        if (n == "expanded") debugger;
+        this.$.container.renderMode = n;
+      }
     },
 
     __getElementPath: function (element) {
@@ -90,10 +111,8 @@
     _containerMode: function (data, expandMode) {
 
       if (!this.$.container) return;
-
-      this.toggleClass("expanded", data == "expanded", this.$.container);
-      this.toggleClass("collapsed", data == "collapsed", this.$.container);
-
+      
+      this.containerMode = data;      
       var openModal = expandMode == "1" || (expandMode == "2" && Tangere.session.browser.mobile);
 
       if (openModal) {
