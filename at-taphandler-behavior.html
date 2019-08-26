@@ -40,8 +40,7 @@
       // logic should be moved to a card specific mixin
       if (this.$.container) {
         this.toggleClass("expanded", n == "expanded", this.$.container);
-        this.toggleClass("collapsed", n == "collapsed" || !n, this.$.container);
-        if (n == "expanded") debugger;
+        this.toggleClass("collapsed", n == "collapsed" || !n, this.$.container);        
         this.$.container.renderMode = n;
       }
     },
