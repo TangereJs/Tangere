@@ -39,6 +39,20 @@
       return browser;
     }
 
+    Tangere.layerOpen = function layerOpen() {
+      Tangere.currentLayer++;
+    }
+
+    Tangere.layerClose = function layerClose() {
+      if(Tangere.currentLayer > 0) {
+        Tangere.currentLayer--;
+      }
+    }
+
+    Tangere.layerZIndex = function layerZIndex() {
+      return Tangere.currentLayer * 100;
+    }
+
     // replace {{vars}} in node innerHTML
     Tangere.render = function render(nodeOrId, model) {
       var node = nodeOrId;
