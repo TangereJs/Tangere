@@ -11,7 +11,7 @@
     Tangere = window.Tangere || {};
     Tangere.behaviors = Tangere.behaviors || {};
     Tangere.config = Tangere.config || {};
-    Tangere.currentLayer = Tangere.currentLayer || 0;
+    Tangere._currentLayer = Tangere._currentLayer || 0;
     Tangere.services = Tangere.services || {};
     Tangere.session = Tangere.session || {};
     Tangere.session.temp = Tangere.session.temp || {};
@@ -40,17 +40,23 @@
     }
 
     Tangere.layerOpen = function layerOpen() {
-      Tangere.currentLayer++;
+      Tangere._currentLayer++;
+      return Tangere.layerZIndex();
     }
 
     Tangere.layerClose = function layerClose() {
-      if(Tangere.currentLayer > 0) {
-        Tangere.currentLayer--;
+      if(Tangere._currentLayer == 0) {
+        console.error("Tangere.layerClose: Can not decrement, _currentLayer is 0!")
+      } else {
+        Tangere._currentLayer--;
+        return Tangere.layerZIndex();
       }
     }
 
     Tangere.layerZIndex = function layerZIndex() {
-      return Tangere.currentLayer * 100;
+      console.log("Current layer: " + Tangere._currentLayer);
+      console.log("Current z-index: " + Tangere._currentLayer * 2000);
+      return Tangere._currentLayer * 2000;
     }
 
     // replace {{vars}} in node innerHTML
