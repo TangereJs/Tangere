@@ -24,9 +24,10 @@
     function _getBrowser() {
       var browser = {};
       var ua = navigator.userAgent;
+      browser.ie11 = !!ua.match(/Trident/i);
 
       browser.android = !!ua.match(/Android/i);
-      browser.ios = !!ua.match(/iPhone|iPod|iPad/i)
+      browser.ios = !!ua.match(/iPhone|iPod|iPad/i);      
       browser.mobile = browser.android || browser.ios;
            
       // small device is seen as mobile (e.g. extension)
