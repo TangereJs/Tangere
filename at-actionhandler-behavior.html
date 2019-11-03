@@ -95,8 +95,9 @@
     },
 
     // handle custom action event
-    _actionHandler: function (e) {
+    _actionHandler: function (e) {    
       this._executeAction(e.detail.action, e.detail.args || {});
+      e.detail.model = this.data.model; // return model
     },
 
     // handle tap event, get action from at-click-action attribute
