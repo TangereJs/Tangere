@@ -27,9 +27,10 @@
       browser.ie11 = !!ua.match(/Trident/i);
 
       browser.android = !!ua.match(/Android/i);
-      browser.ios = !!ua.match(/iPhone|iPod|iPad/i);      
+      browser.ios = (/iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream;      
       browser.mobile = browser.android || browser.ios;
-           
+      browser.touchonly = browser.android || browser.ios;
+
       // small device is seen as mobile (e.g. extension)
       if (window.innerWidth < 500) browser.mobile = true;
       browser.desktop = !browser.mobile;
