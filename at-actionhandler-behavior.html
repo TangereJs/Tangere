@@ -31,7 +31,8 @@
       'tap': '_tapHandler',
       'change': '_changeHandler',
       'input': '_inputHandler',
-      'action': '_actionHandler'
+      'action': '_actionHandler',
+      'keyup': '_keyupHandler'
     },
 
     __getElementPath: function (element) {
@@ -105,13 +106,20 @@
       e.detail.model = this.data.model;      
     },
 
+    // handle keyup event, call at-submit-action on key 10/13
+    _keyupHandler: function (e) {
+      if (e.keyCode == 13 || e.keyCode == 10) {       
+        return this.__eventHandler("at-submit-action", e);
+      }
+    },
+
     // handle tap event, get action from at-click-action attribute
     _tapHandler: function (e) {
       return this.__eventHandler("at-click-action", e);
     },
 
     // handle native change event, get action from at-change-action attribute
-    _changeHandler: function (e) {      
+    _changeHandler: function (e) {     
       return this.__eventHandler("at-change-action", e);
     },
 
