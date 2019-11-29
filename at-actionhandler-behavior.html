@@ -427,6 +427,7 @@
 
         if (cardComponent.properties && typeof cardComponent.properties.model != "undefined") {
           // share model
+          this.model._attrs = args;
           cardComponent.model = this.model;
         }
 
