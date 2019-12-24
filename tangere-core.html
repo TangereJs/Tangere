@@ -7,6 +7,9 @@
 <script>
   (function (scope) {
 
+    // https://github.com/Polymer/polymer/issues/4667
+    Polymer.passiveTouchGestures = true;
+
     // globals
     Tangere = window.Tangere || {};
     Tangere.behaviors = Tangere.behaviors || {};
@@ -369,6 +372,70 @@
         cl.add(toAdd[i]);
       }
     }
+
+    /**
+ * Using:
+ * var queue = new asyncQueue(defaultContext)
+ * queue.add(firstAnimationFrameCallback) // firstAnimationFrameCallback will executed with defaultContext
+ * queue.add(secondAnimationFrameCallback, customContext)
+ * queue.delay() // skip just one frame
+ * queue.clear() // clear animation queue
+**/
+    window.asyncQueue = (function () {
+
+      function asyncQueue(context) {
+        this.context = context || undefined;
+        this.clear();
+      }
+
+      asyncQueue.prototype.add = function (callback, context) {
+        if (callback instanceof Function) {
+          this._queue.push(callback.bind(context || this.context));
+          this._runQueue();
+        }
+
+        return this;
+      }
+
+      asyncQueue.prototype.delay = function () {
+        this._queue.push(undefined);
+        this._runQueue();
+
+        return this;
+      }
+
+      asyncQueue.prototype._runQueue = function () {
+        if (this._queueInProgress) {
+          return;
+        }
+
+        this._queueInProgress = true;
+        requestAnimationFrame(this._queueLoop.bind(this));
+      }
+
+      asyncQueue.prototype._queueLoop = function () {
+        var callback = this._queue.shift();
+
+        callback instanceof Function && callback();
+
+        console.log("asyncQueue pending " + this._queue.length);
+
+        if (!this._queue.length) {
+          this._queueInProgress = false;
+        }
+        else {
+          requestAnimationFrame(this._queueLoop.bind(this));
+        }
+      }
+
+      asyncQueue.prototype.clear = function () {
+        this._queue = [];
+      }
+
+      return asyncQueue;
+    })();
+
+    Tangere.asyncQueue = new asyncQueue();
 
   })(Polymer);
 </script>
