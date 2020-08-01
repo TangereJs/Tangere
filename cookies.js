@@ -153,7 +153,9 @@
 
     return Cookies;
   };
+
   var cookiesExport = (global && typeof global.document === 'object') ? factory(global) : factory;
+  global.Cookies = cookiesExport; // Tangere expects global Cookies
 
   // AMD support
   if (typeof define === 'function' && define.amd) {
@@ -166,7 +168,6 @@
     }
     // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
     exports.Cookies = cookiesExport;
-  } else {
-    global.Cookies = cookiesExport;
-  }
+  }  
+  
 })(typeof window === 'undefined' ? this : window);

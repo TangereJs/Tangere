@@ -62,7 +62,7 @@
           var bind = binds[i];
 
           if (this[bind] == undefined) {
-            console.error("cannot bind to unknown property " + bind);
+            console.warn("cannot bind to unknown property " + bind);
             continue;
           }
 
@@ -78,7 +78,7 @@
             var func = new Function(vars + ";return (" + pre + binder[bind] + post + ");");
             this[bind] = func.call(this.model);
           } catch (ex) {
-            console.error("failed to bind " + bind + " to " + binder[bind] + ": " + ex.message);
+            console.warn("failed to bind " + bind + " to " + binder[bind] + ": " + ex.message);
           }
 
         }
