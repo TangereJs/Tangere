@@ -235,6 +235,8 @@
       // POST to server
       if (attrs && attrs.atAgentAction && action != "modal") {  // modal will post after modal is closed
 
+        if (this.model._hash) delete (this.model._hash); // don't post current _hash
+
         if (attrs.atAgentAction == "nextpage") {
           this.$.post.post({ args: attrs });  // *todo* decide how to control if model should be included or not by default, and/or how to control per action
         } else {
@@ -394,6 +396,9 @@
 
       var cardEl = this.model._card.CardComponent;
 
+      // temp fix for v2 until decided if/how we support modals in the future
+      if (!cardEl) cardEl = ("*/" + this.model._card.elementName).replace("at-card-", ""); 
+      
       var p = cardEl.indexOf("/");
       if (p > 0) {
         cardEl = cardEl.substring(p + 1);
